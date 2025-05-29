@@ -33,6 +33,13 @@ const routes = [
     component: () => import('./pages/ActivityLog.vue'),
     meta: { requiresAuth: true },
   },
+  {
+    path: '/analytics',
+    name: 'PlatformAnalytics',
+    component: () => import('@/pages/PlatformAnalytics.vue'),
+    meta: { requiresAuth: true },
+  }
+  
 ];
 
 const router = createRouter({

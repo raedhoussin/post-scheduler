@@ -34,6 +34,9 @@ class ActivityLogController extends Controller
      */
     public function index(Request $request)
     {
-        return ActivityLog::with('user')->latest()->take(50)->get();
+        $perPage = 10;
+        $logs = ActivityLog::with('user')->latest()->paginate($perPage);
+        return response()->json($logs);
     }
+    
 }

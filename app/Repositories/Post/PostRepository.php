@@ -5,9 +5,15 @@ namespace App\Repositories\Post;
 use App\Models\Post;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
+use App\Services\Post\ScheduledPostLimitValidator;
+
 
 class PostRepository implements PostRepositoryInterface
 {
+    public function __construct(
+        protected ScheduledPostLimitValidator $limitValidator
+    ) {}
+    
     public function paginateByUser(int $userId, array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
         $query = Post::where('user_id', $userId);
@@ -29,6 +35,8 @@ class PostRepository implements PostRepositoryInterface
 
     public function create(array $data): Post
     {
+        $this->limitValidator->validate($data);
+
         return Post::create($data);
     }
 

@@ -21,7 +21,7 @@ class PublishScheduledPosts extends Command
 
         // Get posts scheduled for current time or earlier
         $posts = Post::where('status', 'scheduled')
-           // ->where('scheduled_at', '<=', $now)
+            ->where('scheduled_at', '<=', $now)
             ->with('platforms')
             ->get();
 

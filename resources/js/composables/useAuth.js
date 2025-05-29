@@ -33,7 +33,7 @@ export function useAuth() {
 
   async function fetchUser() {
     try {
-      const response = await axios.get('/api/auth/me');
+      const response = await axios.get('/api/auth/profile');
       console.log('fetchUser response:', response.data);
       user.value = response.data;
       localStorage.setItem('user', JSON.stringify(response.data));

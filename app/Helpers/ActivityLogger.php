@@ -19,6 +19,8 @@ class ActivityLogger
         ]);
         $newActivity->load('user');
         event(new UserActionOccurred($newActivity));
+        broadcast(new UserActionOccurred($newActivity))->toOthers();
+       // dd($newActivity);
 
     }
 }

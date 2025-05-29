@@ -1,66 +1,154 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Post Scheduler
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A Laravel + Vue.js based application for scheduling and managing social media posts across multiple platforms like Twitter, Instagram, LinkedIn, and more.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 📌 Core Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### ✅ Authentication & User Management
+- **User Registration/Login**: Secure authentication using Laravel Sanctum for API token management
+- **Profile Management**: Basic user profile operations (view/edit)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 📝 Post Management System
+- **CRUD Operations**: Full create, read, update, delete functionality for posts
+- **Multi-Platform Publishing**: Select multiple platforms for each post
+- **Post Filtering**: Filter by status (Draft/Scheduled/Published) and date ranges
+- **Post Status Tracking**: 
+  - Draft: Post not ready for scheduling
+  - Scheduled: Queued for future publishing
+  - Published: Successfully sent to platforms
 
-## Learning Laravel
+### 📱 Platform Integration
+- **Platform Configuration**: View and manage available social platforms
+- **User-Specific Access**: Toggle platform availability per user via pivot table
+- **Content Validation**: Enforces platform-specific rules (e.g., Twitter's 280-character limit)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### ⏱️ Automated Scheduling System
+- **Queue-Based Publishing**: Uses Laravel Jobs (`PublishPostJob`) for reliable scheduling
+- **Status Tracking**: Records success/failure for each platform attempt
+- **Error Handling**: 
+  - Implements logging for all publishing attempts
+  - Includes automatic retry logic for failed attempts
+- **Platform-Specific Logic**: Custom handlers for each social platform's API requirements
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 📡 Real-time Activity Monitoring
+- **Event Broadcasting**: Uses Laravel Events (`UserActionOccurred`) for real-time updates
+- **Activity Logging**: 
+  - Stores all user actions in dedicated `activity_logs` table
+  - Tracks: user_id, action type, and descriptive context
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## 🖼️ Frontend Components
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### ✍️ Post Editor Interface
+- **Form Fields**: Title, content body, image upload capability
+- **Platform Selector**: Checkbox-based platform selection
+- **Scheduling Controls**: DateTime picker for post scheduling
+- **Content Assist**: Character counters with platform-specific limits
 
-### Premium Partners
+### 📊 Dashboard Views
+- **Calendar View**: Visual timeline of scheduled posts
+- **List View**: Tabular display with filtering options
+- **Status Indicators**: Color-coded badges for post states
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+### ⚙️ Configuration Panel
+- **Platform Management**: Toggle switches to enable/disable platforms per user
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 🧱 Database Architecture
 
-## Code of Conduct
+### Core Models
+- **User**: Base user account (id, name, email, password_hash)
+- **Post**: Content to be published (id, title, content, image_url, scheduled_at, status, user_id)
+- **Platform**: Social media platforms (id, name, platform_type)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Relationship Tables
+- **PostPlatform**: Junction table tracking post-platform status (post_id, platform_id, publish_status)
+- **PlatformUser**: User-platform permissions (user_id, platform_id, enabled_flag)
+- **ActivityLog**: Audit trail of user actions (id, user_id, action_type, description)
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 🚀 API Structure
 
-## License
+### Authentication Endpoints
+- `POST /api/register` - Create new user account
+- `POST /api/login` - Generate authentication token
+- `GET /api/profile` - Retrieve authenticated user data
+- `Post /api/api/profile` - Update authenticated user data
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Post Management Endpoints
+- `GET /api/posts` - List all user's posts (with filters)
+- `POST /api/posts` - Create new  post
+- `PUT /api/posts/{id}` - Update existing post
+- `DELETE /api/posts/{id}` - Remove  post
+
+### Platform Configuration Endpoints
+- `GET /api/platforms` - List available platforms
+- `POST /api/platforms` - Create new  platform
+- `PUT /api/platforms/{id}` - Update existing platform
+- `DELETE /api/platforms/{id}` - Remove  platforms
+- `POST /api/platforms/toggle` - Enable/disable platform for user
+
+
+### Analytics Configuration Endpoints
+- `GET /api/analytics/posts` - List analytics 
+
+---
+
+## 🛠️ Technology Stack
+
+### Backend
+- **Framework**: Laravel 10
+- **Authentication**: Laravel Sanctum (API tokens)
+- **Asynchronous Processing**: Laravel Queues + Job retry logic
+- **Real-time Updates**: Laravel Events + Broadcasting
+
+### Frontend
+- **Framework**: Vue.js 3 (Composition API)
+- **UI Toolkit**: Bootstrap 5
+- **Real-time Comms**: Laravel Echo + WebSockets
+
+### Infrastructure
+- **Database**: MySQL
+- **Queue Driver**: Redis/database
+- **Broadcasting**: Pusher or native WebSockets
+
+---
+
+## 📦 Deployment Instructions
+
+```bash
+# Clone repository
+git clone https://github.com/raedhoussin/post-scheduler.git
+cd post-scheduler
+
+# Install backend dependencies
+composer install
+
+# Install frontend dependencies
+npm install && npm run dev
+
+# Configure environment
+cp .env.example .env
+php artisan key:generate
+
+# Initialize database
+php artisan migrate --seed
+
+# Launch development server
+#http://localhost:8000
+php artisan serve
+
+# Initialize API Swagger DOC 
+#http://localhost:8000/api/documentation
+php artisan l5-swagger:generate
+
+#To Launch Web Socket :
+# Real Time Update For Activity Logs :
+#"channel('user-activities')"
+#event :UserActionOccurred
+php artisan websockets:serve

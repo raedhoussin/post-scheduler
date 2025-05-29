@@ -9,6 +9,8 @@
       <router-link to="/posts" class="nav-link text-white">📄 View Posts</router-link>
       <router-link to="/platforms" class="nav-link text-white">🧩 Manage Platforms</router-link>
       <router-link to="/activity-log" class="nav-link text-white">📝 Activity Logs</router-link>
+      <router-link to="/analytics" class="nav-link text-white">📝 Analytics</router-link>
+
       <button @click="logout" class="btn btn-danger mt-4">Logout</button>
     </nav>
   </div>

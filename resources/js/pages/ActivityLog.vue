@@ -19,6 +19,30 @@
           <small class="text-muted">{{ log.description }}</small>
         </div>
       </div>
+      <nav aria-label="Page navigation" class="mt-3">
+  <ul class="pagination justify-content-center">
+    <li :class="['page-item', { disabled: pagination.current_page === 1 }]">
+      <button class="page-link" @click="fetchActivityLogs(pagination.current_page - 1)" :disabled="pagination.current_page === 1">
+        Previous
+      </button>
+    </li>
+
+    <li
+      v-for="page in pagination.last_page"
+      :key="page"
+      :class="['page-item', { active: page === pagination.current_page }]"
+    >
+      <button class="page-link" @click="fetchActivityLogs(page)">{{ page }}</button>
+    </li>
+
+    <li :class="['page-item', { disabled: pagination.current_page === pagination.last_page }]">
+      <button class="page-link" @click="fetchActivityLogs(pagination.current_page + 1)" :disabled="pagination.current_page === pagination.last_page">
+        Next
+      </button>
+    </li>
+  </ul>
+</nav>
+
     </div>
   </div>
 </template>
@@ -64,11 +88,18 @@ export default {
   components: { AppSidebar },
   
   data() {
-    return {
-      activityLogs: [],       // Stores all activity log entries
-      flashIndex: null,      // Index of the item to highlight (for new activities)
-    };
-  },
+  return {
+    activityLogs: [],
+    flashIndex: null,
+    pagination: {
+      current_page: 1,
+      last_page: 1,
+      per_page: 50,
+      total: 0,
+    },
+  };
+},
+
 
   mounted() {
     // Fetch initial activity logs when component mounts
@@ -97,14 +128,21 @@ export default {
      * Fetches activity logs from the API
      * @async
      */
-    async fetchActivityLogs() {
-      try {
-        const res = await axios.get('/activity-logs');
-        this.activityLogs = res.data;
-      } catch (error) {
-        console.error('Failed to load activity logs:', error);
-      }
-    },
+     async fetchActivityLogs(page = 1) {
+  try {
+    const res = await axios.get('/activity-logs', { params: { page } });
+    this.activityLogs = res.data.data;  // 
+    this.pagination = {
+      current_page: res.data.current_page,
+      last_page: res.data.last_page,
+      per_page: res.data.per_page,
+      total: res.data.total,
+    };
+  } catch (error) {
+    console.error('Failed to load activity logs:', error);
+  }
+},
+
   },
 };
 </script>

@@ -32,14 +32,10 @@ Route::prefix('auth')->group(function () {
     Route::post('/login',    [AuthController::class, 'login']);
     
     Route::middleware('auth:sanctum')->group(function () {
-        Route::get('/me',     [AuthController::class, 'profile']);
+        Route::get('/profile',     [AuthController::class, 'profile']);
         Route::post('/logout', [AuthController::class, 'logout']);
 
-
     });
-
-
-
 
 });
 
@@ -51,12 +47,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('posts/{post}/publish', [PostController::class, 'publish'])->name('posts.publish');
     Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs');
     Route::post('/profile', [AuthController::class, 'updateProfile']);
-
-
-
+    Route::get('analytics/posts', [AnalyticsController::class, 'postsAnalytics']);
 
 });
-Route::middleware(['auth:sanctum', 'throttle:10,1'])->group(function () {
-    Route::post('/posts', [PostController::class, 'store']);
-});
-Route::get('analytics/posts', [AnalyticsController::class, 'postsAnalytics']);

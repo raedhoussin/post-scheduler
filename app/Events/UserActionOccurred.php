@@ -30,4 +30,9 @@ class UserActionOccurred implements ShouldBroadcast
             'activity' => $this->activity,
         ];
     }
+
+    public function broadcastAs()
+    {
+        return 'UserActionOccurred';
+    }
 }
