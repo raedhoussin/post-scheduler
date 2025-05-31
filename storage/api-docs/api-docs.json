@@ -55,11 +55,12 @@
                 "tags": [
                     "Analytics"
                 ],
-                "summary": "Get posts analytics by platform",
-                "operationId": "a92bce26364cee8e567dbd1fbfb1889b",
+                "summary": "Get posts analytics aggregated by platform",
+                "description": "Retrieves comprehensive statistics about posts distribution and publishing success rate across all platforms",
+                "operationId": "getPostsAnalytics",
                 "responses": {
                     "200": {
-                        "description": "Post analytics data",
+                        "description": "Successful operation",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -67,28 +68,76 @@
                                     "items": {
                                         "properties": {
                                             "platform_id": {
-                                                "type": "integer"
+                                                "description": "Unique identifier of the platform",
+                                                "type": "integer",
+                                                "example": 1
                                             },
                                             "platform_name": {
-                                                "type": "string"
+                                                "description": "Display name of the platform",
+                                                "type": "string",
+                                                "example": "Twitter"
+                                            },
+                                            "platform_type": {
+                                                "description": "Category of the platform",
+                                                "type": "string",
+                                                "example": "social"
                                             },
                                             "total_posts": {
-                                                "type": "integer"
+                                                "description": "Total number of posts scheduled for this platform",
+                                                "type": "integer",
+                                                "example": 25
                                             },
                                             "published_posts": {
-                                                "type": "integer"
+                                                "description": "Number of successfully published posts",
+                                                "type": "integer",
+                                                "example": 20
                                             },
                                             "scheduled_posts": {
-                                                "type": "integer"
+                                                "description": "Number of posts pending publication",
+                                                "type": "integer",
+                                                "example": 5
                                             },
                                             "publish_success_rate": {
-                                                "description": "Percentage",
+                                                "description": "Percentage of successfully published posts (0-100)",
                                                 "type": "number",
-                                                "format": "float"
+                                                "format": "float",
+                                                "example": 80
                                             }
                                         },
                                         "type": "object"
                                     }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Internal server error occurred"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
@@ -670,8 +719,8 @@
                 "tags": [
                     "Posts"
                 ],
-                "summary": "Get list of user's posts with filters",
-                "operationId": "3fda362e2e082b5357ac416e7767e435",
+                "summary": "Get paginated list of user's posts with filtering options",
+                "operationId": "getPostsList",
                 "parameters": [
                     {
                         "name": "status",
@@ -690,7 +739,7 @@
                     {
                         "name": "from_date",
                         "in": "query",
-                        "description": "Filter posts scheduled from this date (YYYY-MM-DD)",
+                        "description": "Filter posts scheduled after this date (YYYY-MM-DD format)",
                         "required": false,
                         "schema": {
                             "type": "string",
@@ -700,7 +749,7 @@
                     {
                         "name": "to_date",
                         "in": "query",
-                        "description": "Filter posts scheduled up to this date (YYYY-MM-DD)",
+                        "description": "Filter posts scheduled before this date (YYYY-MM-DD format)",
                         "required": false,
                         "schema": {
                             "type": "string",
@@ -710,20 +759,62 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "List of posts",
+                        "description": "Successful operation",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/Post"
-                                    }
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Post"
+                                            }
+                                        },
+                                        "links": {
+                                            "description": "Pagination links",
+                                            "type": "object"
+                                        },
+                                        "meta": {
+                                            "description": "Pagination metadata",
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Internal server error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -737,8 +828,9 @@
                     "Posts"
                 ],
                 "summary": "Create a new post",
-                "operationId": "dcb66200c3132996151884ac232cf439",
+                "operationId": "createPost",
                 "requestBody": {
+                    "description": "Post data",
                     "required": true,
                     "content": {
                         "application/json": {
@@ -752,6 +844,7 @@
                                 "properties": {
                                     "title": {
                                         "type": "string",
+                                        "maxLength": 255,
                                         "example": "My first post"
                                     },
                                     "content": {
@@ -765,6 +858,7 @@
                                         "nullable": true
                                     },
                                     "scheduled_at": {
+                                        "description": "Required when status is 'scheduled'",
                                         "type": "string",
                                         "format": "date-time",
                                         "example": "2025-05-25T10:00:00Z",
@@ -780,11 +874,18 @@
                                         "example": "draft"
                                     },
                                     "platforms": {
-                                        "description": "Array of platform IDs to publish this post on",
+                                        "description": "Array of platform IDs where the post should be published",
                                         "type": "array",
                                         "items": {
-                                            "type": "integer"
-                                        }
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "minItems": 1
+                                    },
+                                    "image": {
+                                        "description": "Image file to upload (alternative to image_url)",
+                                        "type": "string",
+                                        "format": "binary"
                                     }
                                 },
                                 "type": "object"
@@ -804,7 +905,31 @@
                         }
                     },
                     "422": {
-                        "description": "Validation error"
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "title": [
+                                                    "The title field is required"
+                                                ],
+                                                "platforms": [
+                                                    "At least one platform must be selected"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "description": "Unauthorized"
@@ -822,8 +947,8 @@
                 "tags": [
                     "Posts"
                 ],
-                "summary": "Get a single post by ID",
-                "operationId": "142b5adb0520cca80cedfe09d9298332",
+                "summary": "Get a specific post",
+                "operationId": "getPostById",
                 "parameters": [
                     {
                         "name": "id",
@@ -837,7 +962,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Post details",
+                        "description": "Successful operation",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -847,7 +972,20 @@
                         }
                     },
                     "404": {
-                        "description": "Post not found"
+                        "description": "Post not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Post not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "description": "Unauthorized"
@@ -864,7 +1002,7 @@
                     "Posts"
                 ],
                 "summary": "Update an existing post",
-                "operationId": "650f4bed0846d9350903d8a17c7b503a",
+                "operationId": "updatePost",
                 "parameters": [
                     {
                         "name": "id",
@@ -877,6 +1015,7 @@
                     }
                 ],
                 "requestBody": {
+                    "description": "Post data",
                     "required": true,
                     "content": {
                         "application/json": {
@@ -884,6 +1023,7 @@
                                 "properties": {
                                     "title": {
                                         "type": "string",
+                                        "maxLength": 255,
                                         "example": "Updated post title"
                                     },
                                     "content": {
@@ -916,7 +1056,13 @@
                                         "type": "array",
                                         "items": {
                                             "type": "integer"
-                                        }
+                                        },
+                                        "minItems": 1
+                                    },
+                                    "image": {
+                                        "description": "Image file to upload (alternative to image_url)",
+                                        "type": "string",
+                                        "format": "binary"
                                     }
                                 },
                                 "type": "object"
@@ -936,7 +1082,20 @@
                         }
                     },
                     "404": {
-                        "description": "Post not found"
+                        "description": "Post not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Post not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "422": {
                         "description": "Validation error"
@@ -956,7 +1115,7 @@
                     "Posts"
                 ],
                 "summary": "Delete a post",
-                "operationId": "9d99f2e42af2f722a058a86245aa856f",
+                "operationId": "deletePost",
                 "parameters": [
                     {
                         "name": "id",
@@ -970,10 +1129,23 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": "Post deleted successfully"
+                        "description": "No content"
                     },
                     "404": {
-                        "description": "Post not found"
+                        "description": "Post not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Post not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "description": "Unauthorized"
@@ -992,7 +1164,7 @@
                     "Posts"
                 ],
                 "summary": "Publish a scheduled post immediately",
-                "operationId": "5f3b057681744e485c43edc4ae845efd",
+                "operationId": "publishPost",
                 "parameters": [
                     {
                         "name": "id",
@@ -1016,7 +1188,20 @@
                         }
                     },
                     "404": {
-                        "description": "Post not found"
+                        "description": "Post not found or not scheduled",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Post not found or not scheduled"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "description": "Unauthorized"
@@ -1034,7 +1219,7 @@
         "schemas": {
             "ActivityLog": {
                 "title": "Activity Log Model",
-                "description": "Represents system activity records",
+                "description": "Tracks and records all significant user actions within the system for auditing and monitoring purposes",
                 "required": [
                     "id",
                     "user_id",
@@ -1043,45 +1228,50 @@
                 ],
                 "properties": {
                     "id": {
-                        "description": "Unique identifier for the activity log",
+                        "description": "Auto-incrementing primary key identifier",
                         "type": "integer",
                         "format": "int64",
                         "example": 1
                     },
                     "user_id": {
-                        "description": "ID of the user who performed the activity",
+                        "description": "Foreign key reference to the user who performed the action",
                         "type": "integer",
                         "example": 5
                     },
                     "action": {
-                        "description": "Type of activity performed",
+                        "description": "Categorized action type",
                         "type": "string",
                         "enum": [
                             "Created post",
                             "Updated post",
-                            "Deleted post"
+                            "Deleted post",
+                            "Scheduled post",
+                            "Published post",
+                            "Platform connected",
+                            "Platform disconnected"
                         ],
                         "example": "Created post"
                     },
                     "description": {
-                        "description": "Detailed description of the activity",
+                        "description": "Detailed contextual information about the activity",
                         "type": "string",
-                        "example": "User created a new post"
+                        "maxLength": 500,
+                        "example": "User created a new post titled 'Summer Campaign'"
                     },
                     "created_at": {
-                        "description": "Timestamp when activity was recorded",
+                        "description": "Automatic timestamp of when the activity was logged",
                         "type": "string",
                         "format": "date-time",
                         "example": "2025-05-26T10:00:00Z"
                     },
                     "updated_at": {
-                        "description": "Timestamp when activity was last updated",
+                        "description": "Timestamp of last update (typically matches created_at)",
                         "type": "string",
                         "format": "date-time",
                         "example": "2025-05-26T10:00:00Z"
                     },
                     "user": {
-                        "description": "Associated user object (nullable)",
+                        "description": "Associated user data through Eloquent relationship",
                         "allOf": [
                             {
                                 "$ref": "#/components/schemas/User"
@@ -1095,6 +1285,10 @@
                                     "name": {
                                         "type": "string",
                                         "example": "John Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "john@example.com"
                                     }
                                 },
                                 "type": "object"
@@ -1106,6 +1300,7 @@
             },
             "Platform": {
                 "title": "Platform",
+                "description": "Represents a social media platform where posts can be published",
                 "required": [
                     "id",
                     "name",
@@ -1113,23 +1308,28 @@
                 ],
                 "properties": {
                     "id": {
+                        "description": "Auto-incrementing unique identifier for the platform",
                         "type": "integer",
                         "example": 1
                     },
                     "name": {
+                        "description": "The display name of the platform (e.g., Twitter, LinkedIn)",
                         "type": "string",
                         "example": "Twitter"
                     },
                     "type": {
+                        "description": "Category of the platform (e.g., social, professional, media)",
                         "type": "string",
                         "example": "social"
                     },
                     "created_at": {
+                        "description": "Timestamp when the platform was added to the system",
                         "type": "string",
                         "format": "date-time",
                         "example": "2025-05-23T14:00:00Z"
                     },
                     "updated_at": {
+                        "description": "Timestamp when the platform record was last updated",
                         "type": "string",
                         "format": "date-time",
                         "example": "2025-05-23T14:00:00Z"
@@ -1139,6 +1339,7 @@
             },
             "Post": {
                 "title": "Post",
+                "description": "Represents a social media post that can be scheduled and published to multiple platforms",
                 "required": [
                     "title",
                     "content",
@@ -1147,30 +1348,36 @@
                 ],
                 "properties": {
                     "id": {
+                        "description": "Auto-incrementing unique identifier for the post",
                         "type": "integer",
                         "example": 1
                     },
                     "title": {
+                        "description": "The title/headline of the post (max 255 chars)",
                         "type": "string",
                         "example": "My first post"
                     },
                     "content": {
+                        "description": "The main body content of the post",
                         "type": "string",
                         "example": "This is the post content"
                     },
                     "image_url": {
+                        "description": "Optional URL to an associated image for the post",
                         "type": "string",
                         "format": "url",
                         "example": "https://example.com/image.jpg",
                         "nullable": true
                     },
                     "scheduled_at": {
+                        "description": "The date/time when the post should be published. Null for immediate posting.",
                         "type": "string",
                         "format": "date-time",
                         "example": "2025-05-23T15:00:00Z",
                         "nullable": true
                     },
                     "status": {
+                        "description": "Current publication status of the post",
                         "type": "string",
                         "enum": [
                             "draft",
@@ -1180,15 +1387,18 @@
                         "example": "scheduled"
                     },
                     "user_id": {
+                        "description": "ID of the user who created the post",
                         "type": "integer",
                         "example": 1
                     },
                     "created_at": {
+                        "description": "Timestamp when the post was first created",
                         "type": "string",
                         "format": "date-time",
                         "example": "2025-05-22T12:00:00Z"
                     },
                     "updated_at": {
+                        "description": "Timestamp when the post was last updated",
                         "type": "string",
                         "format": "date-time",
                         "example": "2025-05-22T12:30:00Z"
@@ -1197,16 +1407,23 @@
                 "type": "object"
             },
             "User": {
+                "description": "User model representing a registered application user",
                 "properties": {
                     "id": {
-                        "type": "integer"
+                        "description": "Unique user identifier",
+                        "type": "integer",
+                        "example": 1
                     },
                     "name": {
-                        "type": "string"
+                        "description": "User's full name",
+                        "type": "string",
+                        "example": "John Doe"
                     },
                     "email": {
+                        "description": "User's email address",
                         "type": "string",
-                        "format": "email"
+                        "format": "email",
+                        "example": "user@example.com"
                     }
                 },
                 "type": "object"

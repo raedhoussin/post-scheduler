@@ -21,7 +21,7 @@ class PostSeeder extends Seeder
         }
 
         foreach ($users as $user) {
-            $postsCount = rand(3, 6); // عدد منشورات لكل مستخدم
+            $postsCount = rand(3, 6);   
 
             for ($i = 0; $i < $postsCount; $i++) {
                 $post = Post::create([
@@ -33,7 +33,6 @@ class PostSeeder extends Seeder
                     'user_id' => $user->id,
                 ]);
 
-                // إرفاق 1 إلى 3 منصات عشوائية
                 $platformsToAttach = $platforms->random(rand(1, min(3, $platforms->count())))->pluck('id')->toArray();
 
                 foreach ($platformsToAttach as $platformId) {

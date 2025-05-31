@@ -42,11 +42,11 @@ Route::prefix('auth')->group(function () {
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('platforms', PlatformController::class);
-    Route::post('platforms/toggle', [PlatformController::class, 'toggleUserPlatform']);
+    Route::post('/platforms/toggle', [PlatformController::class, 'toggleUserPlatform']);
     Route::apiResource('posts', PostController::class);
-    Route::post('posts/{post}/publish', [PostController::class, 'publish'])->name('posts.publish');
+    Route::post('/posts/{post}/publish', [PostController::class, 'publish'])->name('posts.publish');
     Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs');
     Route::post('/profile', [AuthController::class, 'updateProfile']);
-    Route::get('analytics/posts', [AnalyticsController::class, 'postsAnalytics']);
+    Route::get('/analytics/posts', [AnalyticsController::class, 'postsAnalytics']);
 
 });
