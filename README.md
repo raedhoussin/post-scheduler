@@ -152,3 +152,6 @@ php artisan l5-swagger:generate
 #"channel('user-activities')"
 #event :UserActionOccurred
 php artisan websockets:serve
+
+#email : raedhoussin33@gmail.com
+#password : password123
