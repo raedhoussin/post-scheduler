@@ -50,7 +50,7 @@ class PublishScheduledPosts extends Command
                 }
 
                 // Update post status only after dispatching all jobs
-             //   $post->update(['status' => 'published']);
+               $post->update(['status' => 'published']);
                 $this->info("Updated Post ID {$post->id} status to published");
 
             } catch (\Exception $e) {
